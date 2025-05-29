@@ -95,7 +95,7 @@ def time_format(time_str: str) -> str:
         return time_str
 
 
-reg_number = re.compile("\d+")
+reg_number = re.compile("\\d+")
 
 
 def time_stamp(time_str: str) -> Union[Union[datetime, timedelta, str], Any]:
