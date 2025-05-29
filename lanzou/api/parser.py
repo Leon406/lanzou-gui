@@ -1,5 +1,6 @@
 import re
 
+from lanzou.api.utils import remove_notes
 from lanzou.debug import logger
 
 """html页面参数解析"""
@@ -33,6 +34,11 @@ def parse_desc(html: str) -> str:
     desc = re.search(r'class="n_box_des">(.*?)</div>', html) or \
            re.search(r'文件描述.+?</span><br>\n?\s*(.*?)\s*</td>', html)
     return desc.group(1) if desc else ''
+
+def parse_file_id(html: str) -> str:
+    html = remove_notes(html)
+    file_id = re.search(r'file=(\d+?)[\'"]', html)
+    return file_id.group(1) if file_id else ''
 
 
 def parse_sign(html: str) -> str:

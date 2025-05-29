@@ -554,9 +554,10 @@ class LanZouCloud(object):
             # data : 'action=downprocess&sign=AGZRbwEwU2IEDQU6BDRUaFc8DzxfMlRjCjTPlVkWzFSYFY7ATpWYw_c_c&p='+pwd,
             logger.error("!!!!!!!!!!!!!!!!!!!!")
             sign = parse_sign(first_page)
-            post_data = {'action': 'downprocess', 'sign': sign, 'p': pwd}
+            f_file_id = parse_file_id(first_page)
+            post_data = {'action': 'downprocess', 'sign': sign, 'p': pwd,'kd': 1}
             logger.error(f"get_file_info_by_url post_data={post_data}")
-            link_info = self._post(self._host_url + '/ajaxm.php', post_data)  # 保存了重定向前的链接信息和文件名
+            link_info = self._post(self.make_download_url(f_file_id), post_data)  # 保存了重定向前的链接信息和文件名
             logger.error(f"get_file_info_by_url link_info={link_info}")
             second_page = self._get(share_url)  # 再次请求文件分享页面，可以看见文件名，时间，大小等信息(第二页)
             if not link_info or not second_page.text:
@@ -568,6 +569,7 @@ class LanZouCloud(object):
             f_size = parse_file_size(second_page)
             f_time = parse_time(second_page)
             f_desc = parse_desc(second_page)
+            f_file_id = parse_file_id(second_page)
         else:  # 文件没有设置提取码时,文件信息都暴露在分享页面上
             para = re.search(r'<iframe class=.*?src="(.+?)"', first_page).group(1)  # 提取下载页面 URL 的参数
             logger.error(f"get_file_info_by_url else para={para}")
@@ -576,9 +578,10 @@ class LanZouCloud(object):
             f_time = parse_time(first_page)
             f_size = parse_file_size(first_page)
             f_desc = parse_desc(first_page)
-
             first_page = self._get(self._host_url + para)
-            logger.error(f"get_file_info_by_url else frame_page={first_page.text}")
+            logger.error(f"get_file_info_by_url else frame_page=\n{first_page.text}")
+            f_file_id = parse_file_id(first_page.text)
+            logger.error(f"parse_file_id={f_file_id} \n{first_page.text}")
             if not first_page:
                 return FileDetail(LanZouCloud.NETWORK_ERROR, name=f_name, time=f_time,
                                   size=f_size, desc=f_desc, pwd=pwd, url=share_url)
@@ -600,7 +603,8 @@ class LanZouCloud(object):
                     logger.error(e)
                     return FileDetail(LanZouCloud.FAILED)
 
-            link_info = self._post(self._host_url + '/ajaxm.php', post_data)
+            logger.error(f"get_file_info_by_url=== link_info---{f_file_id}")
+            link_info = self._post(self.make_download_url(f_file_id), post_data)
             if not link_info:
                 return FileDetail(LanZouCloud.NETWORK_ERROR, name=f_name, time=f_time, size=f_size, desc=f_desc,
                                   pwd=pwd, url=share_url)
@@ -1396,9 +1400,10 @@ class LanZouCloud(object):
             f_size = parse_file_size(first_page)
             f_time = parse_time(first_page)
             f_desc = parse_desc(first_page)
+            f_file_id = parse_file_id(first_page)
             sign = parse_sign(first_page)
             post_data = {'action': 'downprocess', 'sign': sign, 'p': pwd}
-            link_info = self._post(self._host_url + '/ajaxm.php', post_data)  # 保存了重定向前的链接信息和文件名
+            link_info = self._post(self.make_download_url(f_file_id), post_data)  # 保存了重定向前的链接信息和文件名
             second_page = self._get(f_url)  # 再次请求文件分享页面，可以看见文件名，时间，大小等信息(第二页)
             if not link_info or not second_page.text:
                 return ShareInfo(LanZouCloud.NETWORK_ERROR)
@@ -1422,6 +1427,9 @@ class LanZouCloud(object):
             return ShareInfo(LanZouCloud.SUCCESS, name=f_name, url=f_url, pwd=pwd, desc=f_desc, time=f_time,
                              size=f_size)
 
+    def make_download_url(self, f_file_id):
+        return self._host_url + f'/ajaxm.php?file={f_file_id}'
+
     def get_user_name(self):
         """获取用户名"""
         params = {'item': 'profile', 'action': 'mypower'}
@@ -1435,31 +1443,27 @@ class LanZouCloud(object):
 if __name__ == "__main__":
     lanzou = LanZouCloud()
     # # 文件夹解析
-    # fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b0d8h93hi")
-    # print(fileDetail)
+    fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b0d8h93hi")
+    print(fileDetail)
     # # fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b0d8rnc4d", "80nl")
     # fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b00erfryd", "6mbu")
     # print(fileDetail)
     # fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b0dazruwd",
     #                                            "1111")
     # print(fileDetail)
-    fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b0d8h93hi",
-                                               "")
+    # fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b0d8h93hi", "")
     # print(fileDetail)
 
     # 文件解析
     # 无密码文件
-    # fileDetail = lanzou.get_file_info_by_url("https://leon.lanzoub.com/iJV1f01ns1sh")
+    # fileDetail = lanzou.get_file_info_by_url("https://www.lanzoum.com/icPINgm6zpe")
     # print(fileDetail)
-    # fileDetail = lanzou.get_share_info_by_url("https://leon.lanzoub.com/iJV1f01ns1sh")
+    # fileDetail = lanzou.get_share_info_by_url("https://www.lanzoum.com/icPINgm6zpe")
     # print(fileDetail)
+
     # # 有密码文件
     # fileDetail = lanzou.get_file_info_by_url("https://leon.lanzoub.com/ij31g0jiqieb", "6666")
     # print(fileDetail)
     # fileDetail = lanzou.get_share_info_by_url("https://leon.lanzoub.com/ij31g0jiqieb", "6666")
     # print(fileDetail)
-    # fileDetail = lanzou.get_file_info_by_url(
-    #     "https://leon.lanzoub.com/iqOuv14z74pc")
-    fileDetail = lanzou.get_file_info_by_url(
-        "https://leon.lanzoub.com/ij31g0jiqieb","6666")
-    print(fileDetail)
+

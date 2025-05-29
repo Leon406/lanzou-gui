@@ -64,6 +64,8 @@ coll = COLLECT(exe,
                     'vcruntime140_1.dll',
                     'msvcp140_1.dll',
                     'msvcp140.dll',
+                    'python3.dll',
+                    '_uuid.pyd',
                     'opengl32sw.dll',
                 ],
                name='lanzou-gui')

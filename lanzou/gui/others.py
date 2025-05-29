@@ -138,11 +138,11 @@ class AutoResizingTextEdit(QTextEdit):
         document = self.document().clone()
         document.setTextWidth(document_width)
 
-        return margins.top() + document.size().height() + margins.bottom()
+        return margins.top() + int(document.size().height()) + margins.bottom()
 
     def sizeHint(self):
         original_hint = super(AutoResizingTextEdit, self).sizeHint()
-        return QSize(original_hint.width(), self.heightForWidth(original_hint.width()))
+        return QSize(original_hint.width(), int(self.heightForWidth(original_hint.width())))
 
     def mouseReleaseEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.MouseButton.LeftButton:
@@ -163,11 +163,11 @@ class AutoResizingTextEdit(QTextEdit):
 
         # font_metrics.lineSpacing() is ignored because it seems to be already included in font_metrics.height()
         return int(
-                widget_margins.top() +
-                document_margin +
-                max(num_lines, 1) * font_metrics.height() +
-                self.document().documentMargin() +
-                widget_margins.bottom()
+            widget_margins.top() +
+            document_margin +
+            max(num_lines, 1) * font_metrics.height() +
+            self.document().documentMargin() +
+            widget_margins.bottom()
         )
 
     def focusOutEvent(self, event):
