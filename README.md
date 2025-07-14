@@ -1,4 +1,4 @@
-<img width=0 height=0 src="https://profile-counter.glitch.me/Leon406/count.svg" alt="Leon406:: Visitor's Count" />
+ <img width=0 height=0 src="https://api.visitorbadge.io/api/visitors?path=leon406%2Fleon406&countColor=%232ccce4" alt="Leon406:: Visitor's Count" />
 <p align="center">
 <img src="https://pc.woozooo.com/img/logo2.gif" width="200">
 </p>
