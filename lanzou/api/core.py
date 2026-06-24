@@ -204,13 +204,11 @@ class LanZouCloud(object):
 
     def login_by_cookie(self, cookie: dict) -> int:
         """通过cookie登录"""
-        print("cookie", cookie["ylogin"])
-
         self._session.cookies.update(cookie)
         html = self._get(self._account_url)
         if not html:
             return LanZouCloud.NETWORK_ERROR
-        return LanZouCloud.FAILED if '网盘用户登录' in html.text else LanZouCloud.SUCCESS
+        return LanZouCloud.FAILED if 'yloginname"></span' in html.text else LanZouCloud.SUCCESS
 
     def logout(self) -> int:
         """注销"""
@@ -1443,6 +1441,15 @@ class LanZouCloud(object):
 if __name__ == "__main__":
     lanzou = LanZouCloud()
     # # 文件夹解析
+    cookie = {"_uab_collina":"176153029382431396769396",
+              "ylogin":"867121",
+              "ylogins":"22949e89086b13805cc7fe43d32930c1",
+              "PHPSESSID":"13hng7upp3o48qjrdidavf62p9msi6pe",
+              "phpdisk_info":"VWkCNgNmVWgPPwBhAFMAaAFiAgkLY1I2U2kDZgMyCjBQZ15lUjBSZwQwVw4LM1tnVzMFMlxmBjUGMgk7VWIDMVVlAjUDNVVgDzUAaQA5AD4BNwI5CzFSMVNnA2ADMAppUGFeaFJiUmYEYldmC1hbMFc0BT5cMAZmBj0JalVqAzFVaAI2A1hVaA86AGgAawBuAWICNQtmUjVTaA%3D%3D",
+              }
+    print(lanzou.login_by_cookie(cookie))
+    print(lanzou.get_dir_list(-1))
+
     fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b0d8h93hi")
     print(fileDetail)
     # # fileDetail = lanzou.get_folder_info_by_url("https://leon.lanzoub.com/b0d8rnc4d", "80nl")
